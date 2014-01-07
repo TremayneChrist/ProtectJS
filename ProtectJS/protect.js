@@ -19,7 +19,7 @@ var protect;
 	}
 
 	function protect_public(object, key) {
-		eval('var copy = ' + object.prototype[key].toString().replace('._', '._.'));
+		eval('var copy = ' + object.prototype[key].toString().replace(/\._/g, '._.'));
 		object.prototype[key] = function () {
 			publicResult = undefined;
 			calling = true;
@@ -40,12 +40,10 @@ var protect;
 		object.prototype._[key.substring(1)] = function () {
 
 			if (calling === false) {
-				console.log('Private method protection: %c FAILED', 'color:rgb(255,0,0);font-weight:bold');
 				throw 'You cannot call a private method';
 			}
-			console.log('Private method protection: %c PASSED', 'color:rgb(0,255,0);font-weight:bold');
 			return copy.apply(object, arguments);
 		}
-			delete object.prototype[key];
+		delete object.prototype[key];
 	}
 })();
