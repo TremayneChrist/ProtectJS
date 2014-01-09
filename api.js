@@ -1,23 +1,114 @@
 var API = (function () {
-	function API() {}
+  
+  function API () {
+    var uidHistory, date, uid, randomResult;
+    this._init();
+  }
 
-	API.prototype = {
-		public_1: function () {
-			console.log('I am a public method');
-			console.log('Calling private method(s)');
-			this._private_1('First call', '1');
-			this._private_1('Second call', '2');
-			this._private_1('Third call', '3');
-		},
-		public_2: function () {
-			console.log('I am public throw');
-			throw 'Uh oh!';
-		},
-		_private_1: function (a, b) {
-			console.log('I am private', a, b);
-		}
-	}
+  API.prototype = {
+      
+      // Initialise the API
+      _init: function () {
+          uidHistory = [];
+      },
+      
+      // Gets a random digit string
+      _getRandom: function (digits) {
+          randomResult = '';
+          for (var i = 0; i < digits; i++) {
+              randomResult += Math.floor(Math.random() * 10);
+          }
+          return randomResult;
+      },
+      
+      // Saves the last 10 UIDs
+      _updateHistory: function (item) {
+          uidHistory.unshift(item);
+          if (uidHistory.length > 10) uidHistory.pop();
+      },
+      
+      // Generates a new UID
+      generateID: function () {
+          date = new Date();
+          
+          uid = this._getRandom(2) +
+              date.getYear() +
+              date.getMonth() +
+              date.getDate() +
+              date.getHours() +
+              date.getMinutes() +
+              date.getSeconds() +
+              date.getMilliseconds() +
+              this._getRandom(2);
+          
+          this._updateHistory(uid);
+          
+          return uid;
+      },
+      
+      // Gets the history of the last 10 UIDs
+      getHistory: function () {
+          return uidHistory;
+      }
+  }
+  
+  return API;
+})();
 
-	return protect(API);
+var API_PROTECTED = (function () {
+  
+  function API () {
+    var uidHistory, date, uid, randomResult;
+    this._init();
+  }
+
+  API.prototype = {
+      
+      // Initialise the API
+      _init: function () {
+          uidHistory = [];
+      },
+      
+      // Gets a random digit string
+      _getRandom: function (digits) {
+          randomResult = '';
+          for (var i = 0; i < digits; i++) {
+              randomResult += Math.floor(Math.random() * 10);
+          }
+          return randomResult;
+      },
+      
+      // Saves the last 10 UIDs
+      _updateHistory: function (item) {
+          uidHistory.unshift(item);
+          if (uidHistory.length > 10) uidHistory.pop();
+      },
+      
+      // Generates a new UID
+      generateID: function () {
+          date = new Date();
+          
+          uid = this._getRandom(2) +
+              date.getYear() +
+              date.getMonth() +
+              date.getDate() +
+              date.getHours() +
+              date.getMinutes() +
+              date.getSeconds() +
+              date.getMilliseconds() +
+              this._getRandom(2);
+          
+          this._updateHistory(uid);
+          
+          return uid;
+      },
+      
+      // Gets the history of the last 10 UIDs
+      getHistory: function () {
+          return uidHistory;
+      }
+  }
+  
+  return protect(API);
 })();
 

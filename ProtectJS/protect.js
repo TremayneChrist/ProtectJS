@@ -2,9 +2,11 @@ var protect;
 
 (function () {
 
-	var publicResult, calling = false;
+	var id = 0, validCall = false;
 
+    // Builds the protection of an object
 	protect = function (object) {
+        object = protect_constructer(object);
 		object.prototype._ = {};
 		for (var key in object.prototype) {
 			if (key == '_') continue;
@@ -18,32 +20,57 @@ var protect;
 		return object;
 	}
 
-	function protect_public(object, key) {
-		eval('var fn = ' + object.prototype[key].toString().replace(/\._/g, '._.'));
-		object.prototype[key] = function () {
-			publicResult = undefined;
-			calling = true;
+    // Parses the constructer to allow it to call private methods
+	function protect_constructer(object) {
+        var result, fn, prototypeCopy = object.prototype;
+		eval('fn = ' + object.toString().replace(/\._/g, '._.'));
+		object = function () {
+			validCall = true;
 			try {
-				publicResult = fn.apply(this, arguments);
+				result = fn.apply(this, arguments);
 			}
 			catch (e) {
-				calling = false;
+				validCall = false;
 				throw e;
 			};
-			calling = false;
-			return publicResult;
+			validCall = false;
+			return result;
+		}
+        object.prototype = prototypeCopy;
+        return object;
+	}
+
+    // Parses public methods to allow them to call private ones
+	function protect_public(object, key) {
+        var result, fn;
+        eval('fn = ' + object.prototype[key].toString().replace(/\._/g, '._.'));
+		object.prototype[key] = function () {
+			publicResult = undefined;
+			validCall = true;
+			try {
+				result = fn.apply(this, arguments);
+			}
+			catch (e) {
+				validCall = false;
+				throw e;
+			};
+			validCall = false;
+			return result;
 		}
 	}
 
+    // Protects private methods from outside calls
 	function protect_private(object, key) {
 		var fn = object.prototype[key];
 		object.prototype._[key.substring(1)] = function () {
 
-			if (calling === false) {
-				throw 'You cannot call a private method';
+			if (validCall === true) {
+			   return fn.apply(this, arguments);
 			}
-			return fn.apply(object, arguments);
+          
+			throw 'You cannot call a private method';
 		}
-		delete object.prototype[key];
+        delete object.prototype[key];
 	}
+    
 })();
