@@ -26,3 +26,59 @@ Although processing time is increased, the amount of memory saved is far greater
 1. Creating protected objects is more expensive.
 
 2. Object sizes are increased slightly due to the extra protection that has been added.
+
+###Example
+
+In many languages, it is custom to prepend private variables with an underscore (_), so we use this in JavaScript to show that an object should be concidered as a private. Obviously this has absolutely no affect to whether it is actually private or not, it's more of a visual reference for a developer.
+
+Let's create a basic object using this approach...
+
+```javascript
+
+// Create the object
+function MyObject() {}
+
+// Add methods to the prototype
+MyObject.prototype = {
+  
+  // This is our public method
+  public: function () {
+    alert('PUBLIC');
+  },
+  
+  // This is our private method, using (_)
+  _private: function () {
+    alert('PRIVATE');
+  }
+}
+
+```
+
+Now let's protect the object with ProtectJS!
+
+```javascript
+
+var MyObject = (function () {
+
+  // Create the object
+  function MyObject() {}
+  
+  // Add methods to the prototype
+  MyObject.prototype = {
+    
+    // This is our public method
+    public: function () {
+      alert('PUBLIC');
+    },
+    
+    // This is our private method, using (_)
+    _private: function () {
+      alert('PRIVATE');
+    }
+  }
+  
+  return protect(MyObject);
+  
+})();
+
+```
