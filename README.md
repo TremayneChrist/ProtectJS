@@ -47,6 +47,8 @@ MyObject.prototype = {
   // This is our public method
   public: function () {
     alert('PUBLIC');
+    alert('PUBLIC will call PRIVATE');
+    this._private();
   },
   
   // This is our private method, using (_)
@@ -56,9 +58,21 @@ MyObject.prototype = {
 }
 
 ```
-I stated previously, there is no protection here so I could easily call the **_private()** method and get an alert box saying "PRIVATE".
+As I stated previously, there is no protection here, so I could easily call the **_private()** method and get an alert box saying "PRIVATE".
 
-Now let's protect the object with ProtectJS!
+**Now let's protect the object with ProtectJS!..**
+
+Add ProtectJS into your source, making sure it loads before the code you want to protect.
+
+```html
+<head>
+    <title>PrivateJS</title>
+    <script type="text/javascript" src="ProtectJS/protect.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</head>
+```
+
+We need to use a function here so that we can tell ProtectJS to protect and return the object.
 
 ```javascript
 
@@ -73,6 +87,8 @@ var MyObject = (function () {
     // This is our public method
     public: function () {
       alert('PUBLIC');
+      alert('PUBLIC will call PRIVATE');
+      this._private();
     },
     
     // This is our private method, using (_)
@@ -87,7 +103,7 @@ var MyObject = (function () {
 
 ```
 
-ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
+ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate and hide them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
 
 
 ---
