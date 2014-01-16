@@ -1,10 +1,10 @@
 #ProtectJS
 
-Truely private methods on the prototype chain!
+Truly private methods on the prototype chain!
 
 ###Summary
 
-Many complex objects require complex methods that need to be utilised by the object its self and not from any other external classes. To do this we usually use enclosed functions, blinding any outside classes from them. This works well, however, every time a new instance of the object is created, a new instance of those inclosed functions are also created, which in turn, increases the object's overall size, using more of the machine's memory.
+Many complex objects require complex methods that need to be utilised by the object its self and not from any other external classes. To do this we usually use enclosed functions, blinding any outside classes from them. This works well, however, every time a new instance of the object is created, a new instance of those enclosed functions are also created, which in turn, increases the object's overall size, using more of the machine's memory.
 
 To prevent this we add methods to the prototype chain so that only a single instance of each method is created for all objects. Unfortunately the problem with this is that all methods on the chain are public and can be seen and used by anything, potentially corrupting the object or distorting its values.
 
@@ -17,7 +17,7 @@ Although processing time is increased, the amount of memory saved is far greater
 
 ###Pros
 
-1. Enables private methods be be added onto the prototype, keeping object memory to a minimum.
+1. Enables private methods to be added onto the prototype, keeping object memory to a minimum.
 
 2. Keeps code creation clean and easy to read.
 
@@ -32,7 +32,7 @@ Although processing time is increased, the amount of memory saved is far greater
 
 ###Example
 
-In many languages, it is custom to prepend private variables with an underscore (_), so we use this in JavaScript to show that an object should be concidered as a private. Obviously this has absolutely no affect to whether it is actually private or not, it's more of a visual reference for a developer.
+In many languages, it is custom to prepend private variables with an underscore (_), so we use this in JavaScript to show that an object should be considered as a private. Obviously this has absolutely no affect to whether it is actually private or not, it's more of a visual reference for a developer.
 
 Let's create a basic object using this approach...
 
