@@ -72,7 +72,7 @@ Add ProtectJS into your source, making sure it loads before the code you want to
 </head>
 ```
 
-We need to use a function here so that we can tell ProtectJS to protect and return the object.
+Now that ProtectJS is available, we need to use it on the object. To do this we need to change the way it is built by wrapping it in a function to return the protected result...
 
 ```javascript
 
@@ -104,6 +104,8 @@ var MyObject = (function () {
 ```
 
 ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate and hide them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
+
+Once protected, the only way to call a private method is by calling it through a public one.
 
 
 ---
