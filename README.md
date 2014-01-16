@@ -10,7 +10,7 @@ To prevent this we add methods to the prototype chain so that only a single inst
 
 ProtectJS extends the object and installs protection checks on private methods. If a private method gets called from outside the object the check would fail and throw an error.
 
-Protection does come at a cost though. On average the time taken to create a protected object is 4-5 times that of an unprotected one. This may seem a lot, however we're talking micro seconds, so creating 10,000 medium sized objects would take around 5ms compared to 1ms.
+Protection does come at a cost though. On average the time taken to create a protected object is 4-5 times that of an unprotected one. This may seem a lot, however we're talking microseconds, so creating 10,000 medium sized objects would take around 5ms compared to 1ms.
 
 Although processing time is increased, the amount of memory saved is far greater. Going back to creating 10,000 objects... If you imagine that each object is a particle with physics applied, so each particle will need to check if it's colliding with another one, the direction it's traveling in and how fast it's going etc. These methods do not want to be used by anything but the object its self. If we enclose these methods we would have 10,000 instances of them whereas if we add them to the prototype chain and protect them, yes we use 5 times more compute time, but we've reduced the memory used by those private methods by 10,000 times!
 
