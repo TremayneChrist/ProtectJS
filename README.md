@@ -27,6 +27,7 @@ Although processing time is increased, the amount of memory saved is far greater
 
 2. Object sizes are increased slightly due to the extra protection that has been added.
 
+
 ---
 
 ###Example
@@ -87,3 +88,10 @@ var MyObject = (function () {
 ```
 
 ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
+
+
+---
+
+ProtectJS is still in its early stages so please help out by logging any issues you find, and also any feature requests too.
+
+Have fun!
