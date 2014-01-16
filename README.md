@@ -27,6 +27,8 @@ Although processing time is increased, the amount of memory saved is far greater
 
 2. Object sizes are increased slightly due to the extra protection that has been added.
 
+---
+
 ###Example
 
 In many languages, it is custom to prepend private variables with an underscore (_), so we use this in JavaScript to show that an object should be concidered as a private. Obviously this has absolutely no affect to whether it is actually private or not, it's more of a visual reference for a developer.
@@ -53,6 +55,7 @@ MyObject.prototype = {
 }
 
 ```
+I stated previously, there is no protection here so I could easily call the **_private()** method and get an alert box saying "PRIVATE".
 
 Now let's protect the object with ProtectJS!
 
@@ -82,3 +85,5 @@ var MyObject = (function () {
 })();
 
 ```
+
+ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
