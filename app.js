@@ -1,20 +1,5 @@
 console.log('************************\nTEST - PUBLIC vs PRIVATE\n************************\n');
 
-var items = 10000;
-
-console.time('Time to create ' + items + ' (UNPROTECTED)');
-for (var i = 0; i < items; i++) {
-  var a = new API();
-}
-console.timeEnd('Time to create ' + items + ' (UNPROTECTED)');
-
-console.time('Time to create ' + items + ' (PROTECTED)');
-for (var i = 0; i < items; i++) {
-  var a = new API_PROTECTED();
-}
-console.timeEnd('Time to create ' + items + ' (PROTECTED)');
-
-
 var api = new API();
 console.log('\nThis is an unprotected object');
 console.log('API', api);

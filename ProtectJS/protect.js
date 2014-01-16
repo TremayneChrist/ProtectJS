@@ -2,7 +2,7 @@ var protect;
 
 (function () {
 
-	var id = 0, validCall = false;
+	var validCall = false;
 
     // Builds the protection of an object
 	protect = function (object) {
