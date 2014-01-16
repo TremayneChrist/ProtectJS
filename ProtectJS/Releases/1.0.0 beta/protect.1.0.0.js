@@ -2,11 +2,11 @@ var protect;
 
 (function () {
 
-	var id = 0, validCall = false;
+	var validCall = false;
 
     // Builds the protection of an object
 	protect = function (object) {
-        object = protect_constructer(object);
+        object = protect_constructor(object);
 		object.prototype._ = {};
 		for (var key in object.prototype) {
 			if (key == '_') continue;
@@ -20,8 +20,8 @@ var protect;
 		return object;
 	}
 
-    // Parses the constructer to allow it to call private methods
-	function protect_constructer(object) {
+    // Parses the constructor to allow it to call private methods
+	function protect_constructor(object) {
         var result, fn, prototypeCopy = object.prototype;
 		eval('fn = ' + object.toString().replace(/\._/g, '._.'));
 		object = function () {
