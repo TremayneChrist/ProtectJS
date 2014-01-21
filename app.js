@@ -14,4 +14,4 @@ console.log('result = ' + api._getRandom(5));
 
 console.log('\nWith a protected object, private methods are protected from outsiders');
 console.log('Calling the same method...');
-console.log('result = ' + api_protected._.getRandom(5));
+console.log('result = ' + api_protected._getRandom(5));

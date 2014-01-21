@@ -7,7 +7,6 @@ var protect;
   // Builds the protection of an object
 	protect = function (object) {
     object = protect_constructor(object);
-		object.prototype._ = {};
 
 		// Lists all of the private keys
 		eachKeys(object, function (type, object, key) {
@@ -40,7 +39,6 @@ var protect;
 		}
 
 		for (var key in object.prototype) {
-			if (key == '_') continue;
 			if (key.indexOf('_') == 0 && typeof object.prototype[key] === 'function') {
 				callback('PRIVATE', object, key);
 			}
@@ -61,12 +59,12 @@ var protect;
 
   // Parses the constructor to allow it to call private methods
 	function protect_constructor(object) {
-    var result, fn, prototypeCopy = object.prototype;
-		eval('fn = ' + object.toString().replace(/\._/g, '._.'));
-		object = function () {
+    var result, ProtectJS_Object, prototypeCopy = object.prototype;
+
+		ProtectJS_Object = function () {
 			validCall = true;
 			try {
-				result = fn.apply(this, arguments);
+				result = object.apply(this, arguments);
 			}
 			catch (e) {
 				validCall = false;
@@ -75,15 +73,14 @@ var protect;
 			validCall = false;
 			return result;
 		}
-    object.prototype = prototypeCopy;
-    return object;
+    ProtectJS_Object.prototype = prototypeCopy;
+    return ProtectJS_Object;
 	}
 
   // Parses public methods to allow them to call private ones
 	function protect_public(object, key) {
-    var result, fn;
+    var result, fn = object.prototype[key];
     if (hasPrivateReference(object.prototype[key])) {
-	    eval('fn = ' + object.prototype[key].toString().replace(/\._/g, '._.'));
 			object.prototype[key] = function () {
 				publicResult = undefined;
 				validCall = true;
@@ -103,13 +100,12 @@ var protect;
   // Protects private methods from outside calls
 	function protect_private(object, key) {
 		var fn = object.prototype[key];
-		object.prototype._[key.substring(1)] = function () {
+		object.prototype[key] = function () {
 			if (validCall === true) {
 			   return fn.apply(this, arguments);
 			}
 			throw 'You cannot call a private method';
 		}
-    delete object.prototype[key];
 	}
-    
+
 })();
