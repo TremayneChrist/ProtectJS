@@ -2,11 +2,16 @@ var protect;
 
 (function () {
 
-	var validCall = false, privateKeys = [];
+	var callerID, privateKeys = [], id = 0;
 
   // Builds the protection of an object
 	protect = function (object) {
-    object = protect_constructor(object);
+
+		// Create a new ID
+		incrementID();
+
+		// Build the constructor
+    object = protect_constructor(id, object);
 
 		// Lists all of the private keys
 		eachKeys(object, function (type, object, key) {
@@ -17,17 +22,27 @@ var protect;
 		eachKeys(object, true, function (type, object, key) {
 			switch (type) {
 				case 'PUBLIC': {
-					protect_public(object, key);
+					protect_public(id, object, key);
 					break;
 				}
 				case 'PRIVATE': {
-					protect_private(object, key);
+					protect_private(id, object, key);
 					break;
 				}
 			}
 		});
 
 		return object;
+	}
+
+	// Increments the ID
+	function incrementID() {
+		id++;
+	}
+
+	// Resets the caller ID
+	function resetCallerID() {
+		callerID = undefined;
 	}
 
 	// Finds all methods on the prototype chain
@@ -58,19 +73,19 @@ var protect;
 	}
 
   // Parses the constructor to allow it to call private methods
-	function protect_constructor(object) {
+	function protect_constructor(id, object) {
     var result, ProtectJS_Object, prototypeCopy = object.prototype;
 
 		ProtectJS_Object = function () {
-			validCall = true;
+			callerID = id;
 			try {
 				result = object.apply(this, arguments);
 			}
 			catch (e) {
-				validCall = false;
+				resetCallerID();
 				throw e;
 			};
-			validCall = false;
+				resetCallerID();
 			return result;
 		}
     ProtectJS_Object.prototype = prototypeCopy;
@@ -78,30 +93,30 @@ var protect;
 	}
 
   // Parses public methods to allow them to call private ones
-	function protect_public(object, key) {
+	function protect_public(id, object, key) {
     var result, fn = object.prototype[key];
     if (hasPrivateReference(object.prototype[key])) {
 			object.prototype[key] = function () {
 				publicResult = undefined;
-				validCall = true;
+				callerID = id;
 				try {
 					result = fn.apply(this, arguments);
 				}
 				catch (e) {
-					validCall = false;
+				resetCallerID();
 					throw e;
 				};
-				validCall = false;
+				resetCallerID();
 				return result;
 			}
 		}
 	}
 
   // Protects private methods from outside calls
-	function protect_private(object, key) {
+	function protect_private(id, object, key) {
 		var fn = object.prototype[key];
 		object.prototype[key] = function () {
-			if (validCall === true) {
+			if (callerID === id) {
 			   return fn.apply(this, arguments);
 			}
 			throw 'You cannot call a private method';
