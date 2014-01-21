@@ -2,7 +2,7 @@ var protect;
 
 (function () {
 
-	var callerID, privateKeys = [], id = 0;
+	var callerID, privateID, privateKeys = {}, id = 0;
 
   // Builds the protection of an object
 	protect = function (object) {
@@ -10,13 +10,15 @@ var protect;
 		// Create a new ID
 		incrementID();
 
-		// Build the constructor
-    object = protect_constructor(id, object);
+		resetPrivateID();
 
 		// Lists all of the private keys
 		eachKeys(object, function (type, object, key) {
-			privateKeys.push(key);
+			privateKeys[key] = '_' + privateID++;
 		});
+
+		// Build the constructor
+    object = protect_constructor(id, object);
 
 		// Add protection checks
 		eachKeys(object, true, function (type, object, key) {
@@ -38,6 +40,11 @@ var protect;
 	// Increments the ID
 	function incrementID() {
 		id++;
+	}
+
+	// Increments the ID
+	function resetPrivateID() {
+		privateID = 0;
 	}
 
 	// Resets the caller ID
@@ -65,37 +72,56 @@ var protect;
 
 	// Checks to see whether a function contains references to any private methods
 	function hasPrivateReference(object) {
-		for (var i = 0; i < privateKeys.length; i++) {
-			if (object.toString().indexOf(privateKeys[i] + '(') != -1)
-				return true;
+		var keys = [], objectString = object.toString();
+		for (var key in privateKeys) {
+			if (objectString.indexOf(key + '(') != -1)
+				keys.push(key);
 		}
-		return false;
+		return keys;
+	}
+
+	function buildMethod(keys, methodToParse) {
+		if (protect.options.obfusicatePrivateMethods && keys.length) {
+			var fn = methodToParse.toString();
+			for (var i = 0; i < keys.length; i++) {
+	  		fn = fn.replace(new RegExp(keys[i], 'g'), privateKeys[keys[i]]);
+	  	}
+	  	eval('methodToParse = ' + fn);
+	  }
+  	return methodToParse;
 	}
 
   // Parses the constructor to allow it to call private methods
 	function protect_constructor(id, object) {
-    var result, ProtectJS_Object, prototypeCopy = object.prototype;
+    var result, ProtectJS_Object, prototypeCopy = object.prototype,
+    keys = hasPrivateReference(object);
 
-		ProtectJS_Object = function () {
-			callerID = id;
-			try {
-				result = object.apply(this, arguments);
+    if (keys.length) {
+    	object = buildMethod(keys, object);
+			ProtectJS_Object = function () {
+				callerID = id;
+				try {
+					result = object.apply(this, arguments);
+				}
+				catch (e) {
+					resetCallerID();
+					throw e;
+				};
+					resetCallerID();
+				return result;
 			}
-			catch (e) {
-				resetCallerID();
-				throw e;
-			};
-				resetCallerID();
-			return result;
-		}
-    ProtectJS_Object.prototype = prototypeCopy;
-    return ProtectJS_Object;
+	    ProtectJS_Object.prototype = prototypeCopy;
+	    return ProtectJS_Object;
+	  }
+	  return object;
 	}
 
   // Parses public methods to allow them to call private ones
 	function protect_public(id, object, key) {
-    var result, fn = object.prototype[key];
-    if (hasPrivateReference(object.prototype[key])) {
+    var result, fn, keys = hasPrivateReference(object.prototype[key]);
+
+    if (keys.length) {
+    	fn = buildMethod(keys, object.prototype[key]);
 			object.prototype[key] = function () {
 				publicResult = undefined;
 				callerID = id;
@@ -114,13 +140,27 @@ var protect;
 
   // Protects private methods from outside calls
 	function protect_private(id, object, key) {
-		var fn = object.prototype[key];
-		object.prototype[key] = function () {
+		var keys = hasPrivateReference(object.prototype[key]),
+    fn = object.prototype[key];
+
+    if (keys.length) {
+    	fn = buildMethod(keys, fn);
+    }
+
+		object.prototype[protect.options.obfusicatePrivateMethods ?
+		privateKeys[key] : key] = function () {
 			if (callerID === id) {
 			   return fn.apply(this, arguments);
 			}
 			throw 'You cannot call a private method';
 		}
+
+		if (protect.options.obfusicatePrivateMethods)
+			delete object.prototype[key];
+	}
+
+	protect.options = {
+		obfusicatePrivateMethods: true
 	}
 
 })();
