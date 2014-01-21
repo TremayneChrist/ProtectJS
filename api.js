@@ -1,3 +1,7 @@
+
+// Add extra protection
+protect.options.obfuscatePrivateMethods = true;
+
 var API = (function () {
 
   function API () {
