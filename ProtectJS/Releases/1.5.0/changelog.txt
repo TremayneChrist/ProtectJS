@@ -1,0 +1,4 @@
+Reverted scope back to use default, preventing issues with more complex objects.
+Add method name obfuscation.
+Performance improvements.
+Added changable options.
