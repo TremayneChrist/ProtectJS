@@ -43,25 +43,21 @@ var protect;
   };
 
   // Increments the ID
-
   function incrementID() {
     id++;
   }
 
   // Increments the ID
-
   function resetPrivateID() {
     privateID = 0;
   }
 
   // Resets the caller ID
-
   function resetCallerID() {
     callerID = undefined;
   }
 
   // Finds all methods on the prototype chain
-
   function eachKeys(object, returnPublic, callback) {
 
     if (!callback && typeof returnPublic === 'function') {
@@ -79,7 +75,6 @@ var protect;
   }
 
   // Checks to see whether a function contains references to any private methods
-
   function getPrivateReferences(object) {
     var keys = [],
       objectString = object.toString();
@@ -91,7 +86,6 @@ var protect;
   }
 
   // Build the method
-
   function buildMethod(object, parser) {
     var fn, keys = getPrivateReferences(object);
     if (protect.options.obfuscatePrivateMethods && keys.length) {
@@ -105,7 +99,6 @@ var protect;
   }
 
   // Parses the constructor to allow it to call private methods
-
   function protect_constructor(id, object) {
     var result, ProtectJS_Object, prototypeCopy = object.prototype;
     buildMethod(object, function(fn, hasKeys) {
@@ -130,7 +123,6 @@ var protect;
   }
 
   // Parses public methods to allow them to call private ones
-
   function protect_public(id, object, key) {
     buildMethod(object.prototype[key], function(fn, hasKeys) {
       if (hasKeys) {
@@ -155,7 +147,6 @@ var protect;
   }
 
   // Protects private methods from outside calls
-
   function protect_private(id, object, key) {
     buildMethod(object.prototype[key], function(fn) {
       (object.prototype[protect.options.obfuscatePrivateMethods ?
