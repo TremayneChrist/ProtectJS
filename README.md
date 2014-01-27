@@ -43,22 +43,27 @@ function MyObject() {}
 
 // Add methods to the prototype
 MyObject.prototype = {
-  
+
   // This is our public method
   public: function () {
-    alert('PUBLIC');
-    alert('PUBLIC will call PRIVATE');
-    this._private();
+    console.log('PUBLIC method has been called');
   },
-  
+
   // This is our private method, using (_)
   _private: function () {
-    alert('PRIVATE');
+    console.log('PRIVATE method has been called');
   }
 }
 
+// Create an instance of the object
+var mo = new MyObject();
+
+// Call its methods
+mo.public(); // Pass
+mo._private(); // Pass
+
 ```
-As I stated previously, there is no protection here, so I could easily call the **_private()** method and get an alert box saying "PRIVATE".
+As I stated previously, there is no protection here, so I could easily call the **_private()** method and get a message saying "PRIVATE method has been called".
 
 **Now let's protect the object with ProtectJS!..**
 
@@ -80,32 +85,37 @@ var MyObject = (function () {
 
   // Create the object
   function MyObject() {}
-  
+
   // Add methods to the prototype
   MyObject.prototype = {
-    
+
     // This is our public method
     public: function () {
-      alert('PUBLIC');
-      alert('PUBLIC will call PRIVATE');
-      this._private();
+      console.log('PUBLIC method has been called');
     },
-    
+
     // This is our private method, using (_)
     _private: function () {
-      alert('PRIVATE');
+      console.log('PRIVATE method has been called');
     }
   }
-  
+
   return protect(MyObject);
-  
+
 })();
+
+// Create an instance of the object
+var mo = new MyObject();
+
+// Call its methods
+mo.public(); // Pass
+mo._private(); // Fail
 
 ```
 
-ProtectJS assumes that all methods starting with underscores in the prototype are private, and will move these into their own object to separate and hide them further. As well as this, it will also add protection checks, so even if you inspect the object in the console and find the private methods, you still will not be able to call them.
+ProtectJS assumes that all methods starting with underscores in the prototype are private, and will add protection checks to prevent them from being called outside of the object.
 
-Once protected, the only way to call a private method is by calling it through a public one.
+Once protected, the only way to call a private method is by calling it through another method inside the same object.
 
 
 ---
