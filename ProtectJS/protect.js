@@ -55,31 +55,26 @@ var protect;
   };
 
   // Increments the ID
-
   function incrementID() {
     id++;
   }
 
   // Increments the ID
-
   function resetPrivateID() {
     privateID = 0;
   }
 
   // Resets the caller ID
-
   function resetCallerID() {
     callerID = undefined;
   }
 
   // Stores the original prototype methods
-
   function storeOriginal(prototype, pjsID) {
     originalPrototypes[pjsID] = prototype;
   }
 
   // Finds all methods on the prototype chain
-
   function eachKeys(object, returnPublic, callback) {
 
     if (!callback && typeof returnPublic === 'function') {
@@ -97,7 +92,6 @@ var protect;
   }
 
   // Checks to see whether a function contains references to any private methods
-
   function getPrivateReferences(object) {
     var keys = [],
       objectString = object.toString();
@@ -109,24 +103,41 @@ var protect;
   }
 
   // Build the method
-
-  function buildMethod(object, parser) {
-    var fn, keys = getPrivateReferences(object);
+  function buildMethod(id, object, parser) {
+    var fn = object.toString(), keys = getPrivateReferences(object), parse = false;
     if (protect.options.obfuscatePrivateMethods && keys.length) {
-      fn = object.toString();
       for (var i = 0; i < keys.length; i++) {
         fn = fn.replace(new RegExp(keys[i], 'g'), privateKeys[keys[i]]);
       }
+      parse = true;
+    }
+    if (fn.indexOf('setTimeout(') != -1) {
+      fn = fn.replace(/setTimeout\(/g, 'protectedSetTimeout(' + id + ', ');
+      parse = true;
+    }
+    if (parse) {
       eval('object = ' + fn);
     }
     parser(object, keys.length > 0);
   }
 
-  // Parses the constructor to allow it to call private methods
+  function protectedSetTimeout(id, fn, delay) {
+    return setTimeout(function () {
+      callerID = id;
+      try {
+        fn.apply(this, arguments);
+      } catch (e) {
+        resetCallerID();
+        throw e;
+      }
+      resetCallerID();
+    }, delay);
+  }
 
+  // Parses the constructor to allow it to call private methods
   function protect_constructor(id, object) {
     var result, ProtectJS_Object, prototypeCopy = object.prototype;
-    buildMethod(object, function(fn, hasKeys) {
+    buildMethod(id, object, function(fn, hasKeys) {
       if (hasKeys) {
         ProtectJS_Object = function() {
           callerID = id;
@@ -149,9 +160,8 @@ var protect;
   }
 
   // Parses public methods to allow them to call private ones
-
   function protect_public(id, object, key) {
-    buildMethod(object.prototype[key], function(fn, hasKeys) {
+    buildMethod(id, object.prototype[key], function(fn, hasKeys) {
       if (hasKeys) {
         var result;
         object.prototype[key] = function() {
@@ -174,9 +184,8 @@ var protect;
   }
 
   // Protects private methods from outside calls
-
   function protect_private(id, object, key) {
-    buildMethod(object.prototype[key], function(fn) {
+    buildMethod(id, object.prototype[key], function(fn) {
       (object.prototype[protect.options.obfuscatePrivateMethods ?
         privateKeys[key] : key] = function() {
         if (callerID === id) {
@@ -193,7 +202,6 @@ var protect;
   }
 
   // Code to extend or override a protected object
-
   function extend_override(object, prototype, allowOverride) {
     var key, original = originalPrototypes[object.pjsID];
     if (!original) {
