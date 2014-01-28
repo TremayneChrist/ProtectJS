@@ -4,10 +4,12 @@ var protect;
 
   'use strict';
 
-  var callerID, privateID, privateKeys = {}, id = 0;
+  var callerID, privateID, privateKeys = {}, originalPrototypes = {}, id = 0;
 
   // Builds the protection of an object
-  protect = function(object) {
+  protect = function(object, pjsID) {
+
+    var hasPjsID = pjsID !== undefined;
 
     // Create a new ID
     incrementID();
@@ -15,13 +17,23 @@ var protect;
     // Reset the obfuscation IDs
     resetPrivateID();
 
+    pjsID = pjsID || 'pjs_' + id;
+
+    // Copy and store the current prototype
+    var pCopy = {};
+    for (var key in object.prototype) {
+      pCopy[key] = object.prototype[key];
+    }
+    storeOriginal(pCopy, pjsID);
+
     // Lists all of the private keys
     eachKeys(object, function(type, object, key) {
       privateKeys[key] = '_' + privateID++;
     });
 
     // Build the constructor
-    object = protect_constructor(id, object);
+    if (!hasPjsID)
+      object = protect_constructor(id, object);
 
     // Add protection checks
     eachKeys(object, true, function(type, object, key) {
@@ -43,21 +55,31 @@ var protect;
   };
 
   // Increments the ID
+
   function incrementID() {
     id++;
   }
 
   // Increments the ID
+
   function resetPrivateID() {
     privateID = 0;
   }
 
   // Resets the caller ID
+
   function resetCallerID() {
     callerID = undefined;
   }
 
+  // Stores the original prototype methods
+
+  function storeOriginal(prototype, pjsID) {
+    originalPrototypes[pjsID] = prototype;
+  }
+
   // Finds all methods on the prototype chain
+
   function eachKeys(object, returnPublic, callback) {
 
     if (!callback && typeof returnPublic === 'function') {
@@ -75,6 +97,7 @@ var protect;
   }
 
   // Checks to see whether a function contains references to any private methods
+
   function getPrivateReferences(object) {
     var keys = [],
       objectString = object.toString();
@@ -86,6 +109,7 @@ var protect;
   }
 
   // Build the method
+
   function buildMethod(object, parser) {
     var fn, keys = getPrivateReferences(object);
     if (protect.options.obfuscatePrivateMethods && keys.length) {
@@ -99,6 +123,7 @@ var protect;
   }
 
   // Parses the constructor to allow it to call private methods
+
   function protect_constructor(id, object) {
     var result, ProtectJS_Object, prototypeCopy = object.prototype;
     buildMethod(object, function(fn, hasKeys) {
@@ -119,10 +144,12 @@ var protect;
         ProtectJS_Object = object;
       }
     });
+    ProtectJS_Object.pjsID = 'pjs_' + id;
     return ProtectJS_Object;
   }
 
   // Parses public methods to allow them to call private ones
+
   function protect_public(id, object, key) {
     buildMethod(object.prototype[key], function(fn, hasKeys) {
       if (hasKeys) {
@@ -147,6 +174,7 @@ var protect;
   }
 
   // Protects private methods from outside calls
+
   function protect_private(id, object, key) {
     buildMethod(object.prototype[key], function(fn) {
       (object.prototype[protect.options.obfuscatePrivateMethods ?
@@ -163,6 +191,41 @@ var protect;
         delete object.prototype[key];
     });
   }
+
+  // Code to extend or override a protected object
+
+  function extend_override(object, prototype, allowOverride) {
+    var key, original = originalPrototypes[object.pjsID];
+    if (!original) {
+      throw 'You cannot use \'protect.extend\' to extend an object that has not already been protected';
+    }
+    for (key in prototype) {
+      if (original[key] && !allowOverride) {
+        throw 'Trying to extend object failed because object already contains \'' + key + '\'. Use \'protect.override\' instead';
+      }
+      if (!original[key] && allowOverride) {
+        throw 'Trying to override method \'' + key + '\' failed because method does not exist';
+      }
+      if (typeof prototype[key] !== 'function') {
+        throw 'You can only extend protected objects with methods';
+      }
+      original[key] = prototype[key];
+    }
+    for (key in original) {
+      object.prototype[key] = original[key];
+    }
+    protect(object, object.pjsID);
+  }
+
+  // Extend protected objects
+  protect.extend = function(object, prototype) {
+    extend_override(object, prototype);
+  };
+
+  // Override protected objects
+  protect.override = function(object, prototype) {
+    extend_override(object, prototype, true);
+  };
 
   protect.options = {
     obfuscatePrivateMethods: false
