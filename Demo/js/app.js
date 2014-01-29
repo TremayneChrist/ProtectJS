@@ -2,9 +2,10 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
 	hljs.initHighlightingOnLoad();
 }
-function runTest() {
+function runTest(obfuscate) {
 	var TestObject = (function () {
 		function TestObject () {
+			var _this = this;
 			this.testName = 'Protected object test';
 			this.step_6 = function () {
 				console.log('Step 6: Pass');
@@ -12,13 +13,21 @@ function runTest() {
 			}
 			this.step_8 = function () {
 				console.log('Step 8: Pass');
-				this._end();
+				try {
+					this._end();
+				}
+				catch (e) {
+					console.warn('Failed to end from within the constructor. Ending...');
+					this.end();
+				}
 			}
-			this._init();
+			setTimeout(function () {
+				_this._init();
+			});
 		}
 		TestObject.prototype = {
 			_init: function () {
-				console.log('Initialising - ' + this.testName);
+				console.log('Starting Test...');
 				this.step_1();
 			},
 			step_1: function () {
@@ -30,18 +39,23 @@ function runTest() {
 				this._step_3();
 			},
 			_step_3: function () {
-				var _this = this;
 				console.log('Step 3: Pass');
-				setTimeout(function () {
-					_this._step_4();
-				}, 2000);
+				this._step_4();
 			},
-			_step_4: function () {
+			_step_4: function (stage) {
+				stage = stage ? stage : 0;
 				var _this = this;
-				console.log('Step 4: Pass');
-				setTimeout(function () {
-					_this.step_5();
-				}, 4000);
+				console.log('Step 4' + ('.' + stage) + ': Pass');
+				if (stage < 9) {
+					setTimeout(function () {
+						_this._step_4(stage + 1);
+					}, 100);
+				}
+				else {
+					setTimeout(function () {
+						_this.step_5();
+					}, 1000);
+				}
 			},
 			step_5: function () {
 				console.log('Step 5: Pass');
@@ -52,15 +66,17 @@ function runTest() {
 				console.log('Step 7: Pass');
 				setTimeout(function () {
 					_this.step_8();
-				}, 5000);
+				}, 2000);
+			},
+			end: function () {
+				this._end();
 			},
 			_end: function () {
-				console.log(this.testName = ' completed');
+				console.log(this.testName + ' completed');
 			}
 		}
-
+		protect.options.obfuscatePrivateMethods = obfuscate === true;
 		return protect(TestObject);
-
 	})();
-	new TestObject();
+	return new TestObject();
 }
