@@ -8,6 +8,7 @@ function runTest() {
 			this.testName = 'Protected object test';
 			this.step_6 = function () {
 				console.log('Step 6: Pass');
+				this.step_7();
 			}
 			this.step_8 = function () {
 				console.log('Step 8: Pass');
@@ -33,14 +34,14 @@ function runTest() {
 				console.log('Step 3: Pass');
 				setTimeout(function () {
 					_this._step_4();
-				}, 300);
+				}, 2000);
 			},
 			_step_4: function () {
 				var _this = this;
 				console.log('Step 4: Pass');
 				setTimeout(function () {
 					_this.step_5();
-				}, 600);
+				}, 4000);
 			},
 			step_5: function () {
 				console.log('Step 5: Pass');
@@ -51,7 +52,7 @@ function runTest() {
 				console.log('Step 7: Pass');
 				setTimeout(function () {
 					_this.step_8();
-				}, 1000);
+				}, 5000);
 			},
 			_end: function () {
 				console.log(this.testName = ' completed');
