@@ -44,14 +44,16 @@
     margin: 0 0 80px 0;
   }
   /*Examples*/
-  .example-1-buttonWrapper {
+  .example-1-buttonWrapper,
+  .example-2-buttonWrapper {
     width: 600px;
     height: 50px;
     -webkit-user-select: none;
     user-select: none;
     margin-bottom: 40px;
   }
-  .example-1-buttonWrapper div {
+  .example-1-buttonWrapper div,
+  .example-2-buttonWrapper div {
     float: left;
     padding: 0 10px;
     height: 48px;
@@ -61,9 +63,11 @@
     background: #ddddee;
     color: #333344;
   }
-  .example-1-buttonWrapper div:hover {
+  .example-1-buttonWrapper div:hover,
+  .example-2-buttonWrapper div:hover {
     background: #e8e8ff;
   }
-  .example-1-buttonWrapper div:active {
+  .example-1-buttonWrapper div:active,
+  .example-2-buttonWrapper div:active {
     background: #ccccdd;
   }

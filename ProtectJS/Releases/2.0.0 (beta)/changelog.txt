@@ -1,0 +1,5 @@
+Extend protected objects
+Override protected objects
+Fix - Private method call fails from within a setTimeout
+Bug fixes
+
