@@ -1,6 +1,6 @@
 #ProtectJS
 
-Truly private methods on the prototype chain!
+##Private JavaScript prototype methods!
 
 ###Summary
 
