@@ -1,4 +1,4 @@
-#ProtectJS
+#ProtectJS / Protect JS
 
 ##Private JavaScript prototype methods!
 
