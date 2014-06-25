@@ -1,5 +1,0 @@
-Reverted scope back to use default, preventing issues with more complex objects.
-Fixed loophole where attacks could be made from other protected objects.
-Add method name obfuscation.
-Performance improvements.
-Added changable options.

@@ -1,2 +1,0 @@
-Bug fixes and tidying
-Using strict
