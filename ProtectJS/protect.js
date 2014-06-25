@@ -115,6 +115,10 @@ var protect;
       fn = fn.replace(/setTimeout\(/g, 'protectedSetTimeout(' + id + ', ');
       parse = true;
     }
+    if (fn.indexOf('setInterval(') != -1) {
+      fn = fn.replace(/setInterval\(/g, 'protectedSetInterval(' + id + ', ');
+      parse = true;
+    }
     if (parse) {
       eval('object = ' + fn);
     }
@@ -123,6 +127,19 @@ var protect;
 
   function protectedSetTimeout(id, fn, delay) {
     return setTimeout(function () {
+      callerID = id;
+      try {
+        fn.apply(this, arguments);
+      } catch (e) {
+        resetCallerID();
+        throw e;
+      }
+      resetCallerID();
+    }, delay);
+  }
+
+  function protectedSetInterval(id, fn, delay) {
+    return setInterval(function () {
       callerID = id;
       try {
         fn.apply(this, arguments);
