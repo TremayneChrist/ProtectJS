@@ -117,9 +117,7 @@ Once protected, the only way to call a private method is by calling it through a
 
 ###Cons
 
-1. Creating protected objects is slightly more expensive.
-
-2. You have to include the ProtectJS library in your project.
+1. You have to include the ProtectJS library in your project.
 
 ---
 
