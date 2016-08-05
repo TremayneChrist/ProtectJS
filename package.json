@@ -1,0 +1,35 @@
+{
+  "name": "protect.js",
+  "version": "3.0.0",
+  "description": "Tool for protecting private properties",
+  "main": "protect.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "chai": "^3.5.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TremayneChrist/ProtectJS.git"
+  },
+  "keywords": [
+    "private",
+    "methods",
+    "functions",
+    "properties"
+  ],
+  "author": "Tremayne Christ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TremayneChrist/ProtectJS/issues"
+  },
+  "homepage": "https://github.com/TremayneChrist/ProtectJS#readme"
+}
