@@ -2,8 +2,8 @@
   var callDepth = 0;
   var locked = function () {
     return !callDepth;
-  }
-  window.protect = function (_O) {
+  };
+  var protect = function (_O) {
     var O = _O.prototype || _O;
     Object.keys(O)
     .forEach(function (key) {
@@ -21,7 +21,7 @@
                 }
                 return function () {
                   return original.apply(this, arguments);
-                }
+                };
               }
             },
             set: function () {
@@ -30,7 +30,7 @@
               }
             },
             enumerable: false
-          })
+          });
         }
         else {
           Object.defineProperty(O, key, {
@@ -51,13 +51,22 @@
                   callDepth--;
                 }
                 return result;
-              }
+              };
             },
             set: function () {
               original = arguments[0];
             }
-          })
+          });
         }
     });
+  };
+  if( typeof exports !== 'undefined' ) {
+    if( typeof module !== 'undefined' && module.exports ) {
+      exports = module.exports = protect;
+    }
+    exports.protect = protect;
   }
-})();
+  else {
+    this.protect = protect;
+  }
+}).call(this);

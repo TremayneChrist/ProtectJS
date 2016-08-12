@@ -1,9 +1,12 @@
-describe('ProtectJS', function () {
 
-  var fn;
-  var testObject;
-  var autoProtect;
-  var expect = chai.expect;
+var fn;
+var testObject;
+var autoProtect;
+var protect = this.protect || require('../protect.js');
+var chai = this.chai || require('chai');
+var expect = chai.expect;
+
+describe('ProtectJS', function () {
 
   var test = function () {
 
