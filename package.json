@@ -11,7 +11,7 @@
     "mocha": "^3.0.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests --reporter min"
   },
   "repository": {
     "type": "git",
