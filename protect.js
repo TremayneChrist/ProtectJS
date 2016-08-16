@@ -1,5 +1,7 @@
 (function () {
 
+  'use strict';
+
   var callDepth = 0; // Stores the call depth of the current execution
 
   var locked = function () {
