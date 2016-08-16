@@ -69,6 +69,26 @@ describe('ProtectJS', function () {
       expect(testObj.number).to.equal(4032);
     });
 
+    it('Should allow PUBLIC properties\' types to be changed', function () {
+      fn = function () { return 'fn'; };
+      expect(testObj.number).to.equal(2016);
+      testObj.number = 'hello';
+      expect(testObj.number).to.equal('hello');
+      testObj.number = fn;
+      expect(testObj.number).to.equal(fn);
+      expect(testObj.number()).to.equal('fn');
+    });
+
+    it('Should allow new PUBLIC functions to access PUBLIC properties', function () {
+      testObj.newFn = function () { return this.number; };
+      expect(testObj.newFn()).to.equal(2016);
+    });
+
+    it('Should NOT allow new PUBLIC functions to access PRIVATE properties', function () {
+      testObj.newFn = function () { return this._number; };
+      expect(testObj.newFn()).to.be.undefined;
+    });
+
     it('Should NOT allow PUBLIC functions to be set', function () {
       expect(testObj.function).to.not.be.undefined;
       testObj.function = 123;
