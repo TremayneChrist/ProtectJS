@@ -1,18 +1,20 @@
 #ProtectJS / Protect JS
 
-##Private JavaScript prototype methods!
-
-###Summary
-
-Adding private methods to an object in JavaScript has always been an awkward thing to do as JavaScript doesn't exactly support it. Instead, we either place enclosed functions in the constructor, which consumes more memory per object, or, we enclose both the object definition and our private methods inside of a self-executing function.
+#### Methods/Functions
+Adding private methods to an object in JavaScript has always been an awkward thing to do, as JavaScript doesn't exactly support it. Instead, we either place enclosed functions in the constructor, which consumes more memory per object, or, we enclose both the object definition and our private methods inside of a closure.
 
 The latter is a good way to accomplish private methods in JavaScript as it creates truly private methods and doesn't add to the memory consumption. The problem with it is, is that your private methods are separate from the object and your coding style is different compared to public definitions on the prototype.
 
-ProtectJS is a library that extends objects you define, to allow you to add all your private methods to the prototype chain. It does this by adding protection checks to all of your methods, any marked with a prepending underscore (_) is treated as a private method.
+**ProtectJS** is a library that extends objects you define, to allow you to add all your private methods to the prototype chain. It does this by adding protection checks to all of your methods, any marked with a prepending underscore (_) is treated as a private method.
 
----
+#### Other properties
 
-###Example
+As well as methods, JavaScript doesn't exactly support any type of private property. This becomes a problem when dangerous modifications to these properties occur.
+
+Think of complex algorithms - If these could be modified by external sources, their output would be completely invalidated, potentially causing huge implications.
+
+
+### Examples
 
 In many languages, it is custom to prepend private variables with an underscore (_), so we use this in JavaScript to show that an object should be considered as a private. Obviously this has absolutely no affect to whether it is actually private or not, it's more of a visual reference for a developer.
 
@@ -35,7 +37,7 @@ MyObject.prototype = {
   _private: function () {
     console.log('PRIVATE method has been called');
   }
-}
+};
 
 // Create an instance of the object
 var mo = new MyObject();
@@ -59,32 +61,28 @@ Add ProtectJS into your source, making sure it loads before the code you want to
 </head>
 ```
 
-Now that ProtectJS is available, we need to use it on the object. To do this we need to change the way it is built by wrapping it in a function to return the protected result...
+Now that ProtectJS is available, we need to use it on the object
 
 ```javascript
 
-var MyObject = (function () {
+// Create the object
+function MyObject() {}
 
-  // Create the object
-  function MyObject() {}
+// Add methods to the prototype
+MyObject.prototype = {
 
-  // Add methods to the prototype
-  MyObject.prototype = {
+  // This is our public method
+  public: function () {
+    console.log('PUBLIC method has been called');
+  },
 
-    // This is our public method
-    public: function () {
-      console.log('PUBLIC method has been called');
-    },
-
-    // This is our private method, using (_)
-    _private: function () {
-      console.log('PRIVATE method has been called');
-    }
+  // This is our private method, using (_)
+  _private: function () {
+    console.log('PRIVATE method has been called');
   }
+};
 
-  return protect(MyObject);
-
-})();
+protect(MyObject); // Protect the object prototype
 
 // Create an instance of the object
 var mo = new MyObject();
@@ -102,25 +100,24 @@ Once protected, the only way to call a private method is by calling it through a
 
 ---
 
-###Pros
+### Pros
 
 1. Enables private methods to be added onto the prototype, keeping object memory to a minimum.
 
-2. Keeps code creation clean and easy to read.
+2. Protects your other properties from being modified by external sources.
 
-3. Allows you to define objects in a natural way.
+3. Keeps code creation clean and easy to read.
 
-4. Doesn't change your coding style.
+4. Allows you to define objects in a natural way.
 
-5. Protects methods you don't want to be used.
+5. Doesn't change your coding style.
+
+6. Protects properties you don't want to be used.
 
 
-###Cons
+### Cons
 
 1. You have to include the ProtectJS library in your project.
+2. Marginal overheads to be considered (Performance tests to come)
 
 ---
-
-ProtectJS is still in its early stages so please help out by logging any issues you find, and also any feature requests too.
-
-Have fun!
