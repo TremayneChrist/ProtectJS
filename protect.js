@@ -2,14 +2,14 @@
 
   'use strict';
 
-  var callDepth = 0; // Stores the call depth of the current execution
-
-  var locked = function () {
-    return !callDepth;
-  };
-
   // The protect object
   var protect = function (_O) {
+
+    var callDepth = 0; // Stores the call depth of the current execution
+
+    var locked = function () {
+      return !callDepth;
+    };
 
     var O = _O.prototype || _O; // Protect the prototype, if there is one
 

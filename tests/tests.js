@@ -112,6 +112,26 @@ describe('ProtectJS', function () {
       testObj._function = function () {};
       expect(testObj._function).to.be.undefined;
     });
+
+    it('Should NOT allow PRIVATE property access from other objects', function () {
+      var obj2 = {
+        fn: function () {
+          return testObj._function();
+        },
+        prop: function () {
+          return testObj._number + testObj._string;
+        }
+      };
+
+      // Unprotected
+      expect(obj2.fn).to.throw();
+      expect(obj2.prop()).to.be.NaN;
+
+      // Protected
+      protect(obj2);
+      expect(obj2.fn).to.throw();
+      expect(obj2.prop()).to.be.NaN;
+    });
   };
 
   describe('Literal Objects', function () {
