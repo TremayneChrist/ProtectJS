@@ -25,18 +25,14 @@ Let's create a basic object using this approach...
 // Create the object
 function MyObject() {}
 
-// Add methods to the prototype
-MyObject.prototype = {
+// This is our public method
+MyObject.prototype.public = function () {
+  console.log('PUBLIC method has been called');
+};
 
-  // This is our public method
-  public: function () {
-    console.log('PUBLIC method has been called');
-  },
-
-  // This is our private method, using (_)
-  _private: function () {
-    console.log('PRIVATE method has been called');
-  }
+// This is our private method, using (_)
+MyObject.prototype._private = function () {
+  console.log('PRIVATE method has been called');
 };
 
 // Create an instance of the object
@@ -68,18 +64,14 @@ Now that ProtectJS is available, we need to use it on the object
 // Create the object
 function MyObject() {}
 
-// Add methods to the prototype
-MyObject.prototype = {
+// This is our public method
+MyObject.prototype.public = function () {
+  console.log('PUBLIC method has been called');
+};
 
-  // This is our public method
-  public: function () {
-    console.log('PUBLIC method has been called');
-  },
-
-  // This is our private method, using (_)
-  _private: function () {
-    console.log('PRIVATE method has been called');
-  }
+// This is our private method, using (_)
+MyObject.prototype._private = function () {
+  console.log('PRIVATE method has been called');
 };
 
 protect(MyObject); // Protect the object prototype
