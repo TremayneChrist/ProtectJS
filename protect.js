@@ -13,7 +13,7 @@
 
     var O = _O.prototype || _O; // Protect the prototype, if there is one
 
-    Object.keys(O).forEach(function (key) {
+    Object.getOwnPropertyNames(O).forEach(function (key) {
 
         var value = O[key]; // The original property value
         var isFunction = typeof value === 'function';

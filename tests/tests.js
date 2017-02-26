@@ -8,19 +8,25 @@ var expect = chai.expect;
 
 describe('ProtectJS', function () {
 
-  var test = function () {
+  var test = function (options) {
+
+    options = options || {};
 
     it('Should successfully protect the object', function () {
+      autoProtect = true;
       fn = function () {
         protect(testObj);
-        autoProtect = true;
       }
-      // Should show all properties as enumerable
-      expect(Object.keys(testObj.prototype || testObj)).lengthOf(14);
+      if (!!options.enumerable) {
+        // Should show all properties as enumerable
+        expect(Object.keys(testObj.prototype || testObj)).lengthOf(14);
+      }
       // Should protect the object without any errors
       expect(fn).to.not.throw();
-      // Once protected, the enumerable values should only be public ones
-      expect(Object.keys(testObj.prototype || testObj)).lengthOf(7);
+      if (!!options.enumerable) {
+        // Once protected, the enumerable values should only be public ones
+        expect(Object.keys(testObj.prototype || testObj)).lengthOf(7);
+      }
     });
 
     it('Should NOT return PRIVATE properties', function () {
@@ -32,7 +38,7 @@ describe('ProtectJS', function () {
       expect(testObj._object).to.be.undefined;
       expect(testObj._null).to.be.undefined;
       expect(testObj._undefined).to.be.undefined;
-      expect(testObj._function).to.be.undefined;
+      expect(testObj._fn).to.be.undefined;
       expect(fn).to.throw();
     });
 
@@ -42,8 +48,8 @@ describe('ProtectJS', function () {
       expect(testObj.object).to.not.be.undefined;
       expect(testObj.null).to.be.null;
       expect(testObj.undefined).to.be.undefined;
-      expect(testObj.function).to.not.throw();
-      expect(testObj.function()).to.equal('Hello Universe 2016');
+      expect(testObj.fn.bind(testObj)).to.not.throw();
+      expect(testObj.fn()).to.equal('Hello Universe 2016');
     });
 
     it('Should allow PRIVATE methods to be called from PUBLIC ones', function () {
@@ -90,9 +96,9 @@ describe('ProtectJS', function () {
     });
 
     it('Should NOT allow PUBLIC functions to be set', function () {
-      expect(testObj.function).to.not.be.undefined;
-      testObj.function = 123;
-      expect(testObj.function).to.not.equal(123);
+      expect(testObj.fn).to.not.be.undefined;
+      testObj.fn = 123;
+      expect(testObj.fn).to.not.equal(123);
     });
 
     it('Should NOT allow PRIVATE strings to be set', function () {
@@ -108,15 +114,15 @@ describe('ProtectJS', function () {
     });
 
     it('Should NOT allow PRIVATE functions to be set', function () {
-      expect(testObj._function).to.be.undefined;
-      testObj._function = function () {};
-      expect(testObj._function).to.be.undefined;
+      expect(testObj._fn).to.be.undefined;
+      testObj._fn = function () {};
+      expect(testObj._fn).to.be.undefined;
     });
 
     it('Should NOT allow PRIVATE property access from other objects', function () {
       var obj2 = {
         fn: function () {
-          return testObj._function();
+          return testObj._fn();
         },
         prop: function () {
           return testObj._number + testObj._string;
@@ -150,7 +156,7 @@ describe('ProtectJS', function () {
         '_object': {},
         '_null': null,
         '_undefined': undefined,
-        '_function': function () {
+        '_fn': function () {
           return [this._string, this.number].join(' ');
         },
 
@@ -160,7 +166,7 @@ describe('ProtectJS', function () {
         'object': {},
         'null': null,
         'undefined': undefined,
-        'function': function () {
+        'fn': function () {
           return [this.string, this.number].join(' ');
         },
 
@@ -200,7 +206,7 @@ describe('ProtectJS', function () {
         this._object = {};
         this._null = null;
         this._undefined = undefined;
-        this._function = function () {
+        this._fn = function () {
           return [this.string, this.number].join(' ');
         };
 
@@ -210,7 +216,7 @@ describe('ProtectJS', function () {
         this.object = {};
         this.null = null;
         this.undefined = undefined;
-        this.function = function () {
+        this.fn = function () {
           return [this.string, this.number].join(' ');
         };
 
@@ -252,7 +258,7 @@ describe('ProtectJS', function () {
       MyObject.prototype._object = {};
       MyObject.prototype._null = null;
       MyObject.prototype._undefined = undefined;
-      MyObject.prototype._function = function () {
+      MyObject.prototype._fn = function () {
         return [this.string, this.number].join(' ');
       };
 
@@ -262,7 +268,7 @@ describe('ProtectJS', function () {
       MyObject.prototype.object = {};
       MyObject.prototype.null = null;
       MyObject.prototype.undefined = undefined;
-      MyObject.prototype.function = function () {
+      MyObject.prototype.fn = function () {
         return [this.string, this.number].join(' ');
       };
 
@@ -285,6 +291,141 @@ describe('ProtectJS', function () {
     });
 
     test(); // Run the generic tests
+
+  });
+
+  describe('ES6 Classes (Instance)', function () {
+
+    before(function () {
+      autoProtect = false;
+    });
+
+    beforeEach(function () {
+      
+      class MyObject {
+
+        constructor () {
+          
+          // Private
+          this._string = 'Hello Universe';
+          this._number = 2016;
+          this._object = {};
+          this._null = null;
+          this._undefined = undefined;
+          this._fn = function () {
+            return [this.string, this.number].join(' ');
+          };
+
+          // Public
+          this.string = 'Hello Universe';
+          this.number = 2016;
+          this.object = {};
+          this.null = null;
+          this.undefined = undefined;
+          this.fn = function () {
+            return [this.string, this.number].join(' ');
+          };
+
+          // Test functions
+          this.public = function () {
+            return 10 + this._private();
+          }
+          this._private = function () {
+            return 2006;
+          }
+
+          if (autoProtect) {
+            protect(this);
+          }
+        }
+
+      }
+      
+      testObj = new MyObject();
+
+    });
+
+    test();
+
+  });
+
+  describe('ES6 Classes (Prototype)', function () {
+
+    before(function () {
+      autoProtect = false;
+    });
+
+    beforeEach(function () {
+
+      let number = 2016; // used for setting in test
+      
+      class MyObject {
+
+        // Private
+        get _string () {
+          return 'Hello Universe';
+        }
+        get _number () {
+          return 2016;
+        }
+        get _object () {
+          return {};
+        }
+        get _null () {
+          return null;
+        }
+        get _undefined () {
+          return undefined;
+        }
+        _fn () {
+          return [this.string, this.number].join(' ');
+        }
+
+        // Public
+        get string () {
+          return 'Hello Universe';
+        }
+        get number () {
+          return number;
+        }
+        // Test needs to set an item
+        set number (v) {
+          return number = v;
+        }
+        get object () {
+          return {};
+        }
+        get null () {
+          return null;
+        }
+        get undefined () {
+          return undefined;
+        }
+        fn () {
+          return [this.string, this.number].join(' ');
+        }
+
+        // Test functions
+        public () {
+          return 10 + this._private();
+        }
+        _private () {
+          return 2006;
+        }
+
+      }
+      
+      if (autoProtect) {
+        protect(MyObject);
+        testObj = new MyObject();
+      }
+      else {
+        testObj = MyObject;
+      }
+
+    });
+
+    test({ enumerable: false });
 
   });
 
