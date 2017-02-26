@@ -1,6 +1,7 @@
+'use strict';
 
 var fn;
-var testObject;
+var testObj;
 var autoProtect;
 var protect = this.protect || require('../protect.js');
 var chai = this.chai || require('chai');
