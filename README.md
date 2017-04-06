@@ -1,4 +1,4 @@
-#ProtectJS / Protect JS
+# ProtectJS / Protect JS
 
 [![Build Status](https://travis-ci.org/TremayneChrist/ProtectJS.svg?branch=master)](https://travis-ci.org/TremayneChrist/ProtectJS)
 
