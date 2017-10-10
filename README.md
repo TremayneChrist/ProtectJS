@@ -1,6 +1,7 @@
-#ProtectJS / Protect JS
+# ProtectJS / Protect JS
 
 [![Build Status](https://travis-ci.org/TremayneChrist/ProtectJS.svg?branch=master)](https://travis-ci.org/TremayneChrist/ProtectJS)
+[![Coverage Status](https://coveralls.io/repos/github/TremayneChrist/ProtectJS/badge.svg?branch=master)](https://coveralls.io/github/TremayneChrist/ProtectJS?branch=master)
 
 #### Methods/Functions
 Adding private methods to an object in JavaScript has always been an awkward thing to do, as JavaScript doesn't exactly support it. Instead, we either place enclosed functions in the constructor, which consumes more memory per object, or, we enclose both the object definition and our private methods inside of a closure.
