@@ -8,10 +8,13 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^3.0.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.0.1"
   },
   "scripts": {
-    "test": "mocha tests --reporter min"
+    "ut": "mocha tests --reporter min",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha tests --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
     "type": "git",
