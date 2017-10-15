@@ -3,7 +3,7 @@
   'use strict';
 
   // The protect object
-  var protect = function (_O) {
+  this.protect = function (_O) {
 
     var callDepth = 0; // Stores the call depth of the current execution
 
@@ -36,6 +36,7 @@
             set: function () {
               if (!locked()) {
                 value = arguments[0];
+                isFunction = typeof value === 'function';
               }
             },
             enumerable: false // Remove from Object.keys
@@ -64,6 +65,7 @@
             },
             set: function () {
               value = arguments[0];
+              isFunction = false; // New functions cannot unlock private properties
             }
           });
         }
@@ -71,14 +73,8 @@
   };
 
   // Make it available for both Node and Browser
-  if( typeof exports !== 'undefined' ) {
-    if( typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = protect;
-    }
-    exports.protect = protect;
-  }
-  else {
-    this.protect = protect;
+  if(typeof module !== 'undefined' && module.exports) {
+    module.exports = this.protect;
   }
 
 }).call(this);
