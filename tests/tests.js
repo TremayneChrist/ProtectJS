@@ -16,11 +16,11 @@ describe('ProtectJS', function () {
         autoProtect = true;
       }
       // Should show all properties as enumerable
-      expect(Object.keys(testObj.prototype || testObj)).lengthOf(14);
+      expect(Object.keys(testObj.prototype || testObj)).lengthOf(16);
       // Should protect the object without any errors
       expect(fn).to.not.throw();
       // Once protected, the enumerable values should only be public ones
-      expect(Object.keys(testObj.prototype || testObj)).lengthOf(7);
+      expect(Object.keys(testObj.prototype || testObj)).lengthOf(8);
     });
 
     it('Should NOT return PRIVATE properties', function () {
@@ -68,6 +68,20 @@ describe('ProtectJS', function () {
       testObj.number *= 2;
       expect(testObj.number).to.equal(4032);
     });
+    
+    it('Should allow PUBLIC functions to be set', function () {
+      var newFn = function () {};
+      expect(testObj.function).to.not.be.undefined;
+      testObj.function = newFn;
+      expect(testObj.function).to.equal(newFn);
+    });
+    
+    it('Should allow PUBLIC functions to set PUBLIC & PRIVATE properties', function () {
+      var obj = testObj.object;
+      var newObj = {};
+      expect(obj).to.not.equal(newObj);
+      expect(testObj.setFunction(newObj)).to.equal(true);
+    });
 
     it('Should allow PUBLIC properties\' types to be changed', function () {
       fn = function () { return 'fn'; };
@@ -75,8 +89,10 @@ describe('ProtectJS', function () {
       testObj.number = 'hello';
       expect(testObj.number).to.equal('hello');
       testObj.number = fn;
+      testObj.function = 123;
       expect(testObj.number).to.equal(fn);
       expect(testObj.number()).to.equal('fn');
+      expect(testObj.function).to.equal(123);
     });
 
     it('Should allow new PUBLIC functions to access PUBLIC properties', function () {
@@ -88,11 +104,14 @@ describe('ProtectJS', function () {
       testObj.newFn = function () { return this._number; };
       expect(testObj.newFn()).to.be.undefined;
     });
-
-    it('Should NOT allow PUBLIC functions to be set', function () {
-      expect(testObj.function).to.not.be.undefined;
-      testObj.function = 123;
-      expect(testObj.function).to.not.equal(123);
+    
+    it('Should NOT allow modified PUBLIC functions to access private properties', function () {
+      var newFn = function () {
+        return 10 + this._private();
+      };
+      expect(testObj.public()).to.equal(2016);
+      testObj.public = newFn;
+      expect(testObj.public).to.throw();
     });
 
     it('Should NOT allow PRIVATE strings to be set', function () {
@@ -165,6 +184,14 @@ describe('ProtectJS', function () {
         },
 
         // Test functions
+        setFunction: function (newObj) {
+          this._object = newObj;
+          return newObj === this._setFunction();
+        },
+        _setFunction: function () {
+          this.object = this._object;
+          return this.object;
+        },
         public: function () {
           return 10 + this._private();
         },
@@ -215,6 +242,14 @@ describe('ProtectJS', function () {
         };
 
         // Test functions
+        this.setFunction = function (newObj) {
+          this._object = newObj;
+          return newObj === this._setFunction();
+        }
+        this._setFunction = function () {
+          this.object = this._object;
+          return this.object;
+        }
         this.public = function () {
           return 10 + this._private();
         }
@@ -267,6 +302,14 @@ describe('ProtectJS', function () {
       };
 
       // Test functions
+      MyObject.prototype.setFunction = function (newObj) {
+        this._object = newObj;
+        return newObj === this._setFunction();
+      }
+      MyObject.prototype._setFunction = function () {
+        this.object = this._object;
+        return this.object;
+      }
       MyObject.prototype.public = function () {
         return 10 + this._private();
       }
